@@ -2,8 +2,6 @@ var http = require("http");
 var createError = require("http-errors");
 var express = require("express");
 var app = express();
-var server = http.createServer(app);
-server.listen(5000);
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
@@ -28,18 +26,6 @@ app.use("/users", userRouter);
 app.use(function (req, res, next) {
   next(createError(404));
 });
-
-// Socket code --> will be moved into seperate files
-const io = require("socket.io")(server, {
-  cors: { origin: ["http://localhost:8080"] },
-});
-const { sendMessage, joinRoom } = require("./socket/socketHandler")(io);
-const onConnection = (socket) => {
-  socket.on("room:join", joinRoom);
-  socket.on("message:send", sendMessage);
-};
-
-io.on("connection", onConnection);
 
 // error handler
 app.use(function (err, req, res, next) {

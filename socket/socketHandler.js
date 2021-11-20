@@ -13,9 +13,15 @@ module.exports = (io) => {
         socket.join(room);
         callback(`Joined room ${room}`);
     };
+
+    const drawCanvas = function (room,coordinates) {
+        const socket = this;
+        //socket.to(room).emit('drawing-data',coordinates);
+    }
   
     return {
       sendMessage,
-      joinRoom
+      joinRoom,
+      drawCanvas
     }
   }
