@@ -1,5 +1,8 @@
-const signIn = () => {}
-const signUp = () => {}
-const signOut = () => {}
+const User = require("../model/User")
 
-module.exports = {signIn , signUp , signOut}
+const signUp = async (req, res) => {
+    const user = new User(req.body)
+};
+const signIn = () => {};
+
+module.exports = { signIn, signUp };
