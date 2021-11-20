@@ -13,7 +13,7 @@ const { connectDB } = require("./db");
 
 //Connect to db
 connectDB()
-  .then((r) => console.log("xd", r))
+  .then((r) => console.log("Mongo connection established", r))
   .catch((e) => console.log(e));
 
 app.use(logger("dev"));
@@ -30,16 +30,16 @@ app.use(function (req, res, next) {
 });
 
 // Socket code --> will be moved into seperate files
-/*const io = require("socket.io")(server, {
+const io = require("socket.io")(server, {
   cors: { origin: ["http://localhost:8080"] },
 });
-const { sendMessage, joinRoom } = require("./socketHandler")(io);
+const { sendMessage, joinRoom } = require("./socket/socketHandler")(io);
 const onConnection = (socket) => {
   socket.on("room:join", joinRoom);
   socket.on("message:send", sendMessage);
 };
 
-io.on("connection", onConnection);*/
+io.on("connection", onConnection);
 
 // error handler
 app.use(function (err, req, res, next) {
