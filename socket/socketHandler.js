@@ -1,3 +1,4 @@
+/*
 module.exports = (io) => {
     const sendMessage = function (message,room) {
         const socket = this;
@@ -18,4 +19,4 @@ module.exports = (io) => {
       sendMessage,
       joinRoom
     }
-  }
+  }*/
