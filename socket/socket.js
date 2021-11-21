@@ -2,40 +2,54 @@ const { joinRoom, sendMessage, drawCanvas } = require("./socketHandler");
 var socket_io = require("socket.io");
 var io = socket_io();
 var socketApi = {};
-var connectedUsers = {
-  room1: ["user1", "user2"],
-};
+var connectedUsers = {};
 socketApi.io = io;
 
 io.on("connection", function (socket) {
-  socket.on("room:join", (room, id) => {
-    if (connectedUsers[room]) {
-      connectedUsers[room] = [...id];
-      socket.join(room);
-    } else connectedUsers[room] = [id];
+  console.log("Socket connected");
+  socket.on("disconnect", () => {
+    for (const room in connectedUsers) {
+      const index = connectedUsers[room].indexOf(socket.id);
+      if (index > -1) {
+        connectedUsers[room].splice(index, 1);
+        if (connectedUsers[room].length === 0) {
+          delete connectedUsers[room];
+        }
+      }
+    }
+
+    console.log("on disconnect", connectedUsers);
   });
 
-  socket.on("room:leave", (room, id) => {
-    const index = array.indexOf(id);
-    if (index > -1) {
-      array.splice(index, 1);
+  socket.on("room:join", (data) => {
+    socket.join(data.roomId);
+
+    if (connectedUsers[data.roomId]) {
+      connectedUsers[data.roomId] = [...connectedUsers[data.roomId], { userName: data.userName, socketId: socket.id,points : 0 }];
     }
-    socket.leave(id);
+    //init room
+    else {
+      connectedUsers = {
+        ...connectedUsers,
+        [data.roomId]: [{ userName: data.userName, socketId: socket.id,points : 0 }],
+      };
+    }
+    console.log("connectedUsers", connectedUsers);
+    console.log("rooms", io.sockets.adapter.rooms);
   });
+
+  // socket.on("room:leave", (roomId) => {
+  //   const index = connectedUsers[roomId].indexOf(socket.id);
+  //   if (index > -1) {
+  //     connectedUsers[roomId].splice(index, 1);
+  //   }
+  //   socket.leave(socket.id);
+  //   console.log("Leave çalıştı -> ", connectedUsers);
+  // });
   //socket.on("room:join", joinRoom);
   //socket.on("message:send", sendMessage);
-  console.log("Socket connected");
   socket.on("canvas:draw", (data) => {
-    socket.broadcast.emit("canvas:drawing", data);
-  });
-  socket.on("drawtime:get", () => {
-    console.log("drwatime console");
-    let time = 30;
-    const drawTime = setInterval(() => {
-      socket.emit("drawtime:send", time);
-      time--;
-      if (time === 0) clearInterval(drawTime);
-    }, 1000);
+    socket.broadcast.to(data.roomId).emit("canvas:drawing", data);
   });
 });
 

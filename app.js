@@ -11,7 +11,7 @@ const { connectDB } = require("./db");
 
 //Connect to db
 connectDB()
-  .then((r) => console.log("Mongo connection established", r))
+  .then()
   .catch((e) => console.log(e));
 
 app.use(logger("dev"));
