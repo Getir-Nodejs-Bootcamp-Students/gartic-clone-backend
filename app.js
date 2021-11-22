@@ -1,17 +1,17 @@
-const http = require("http");
-const createError = require("http-errors");
-const express = require("express");
-const app = express();
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const logger = require("morgan");
+var http = require("http");
+var createError = require("http-errors");
+var express = require("express");
+var app = express();
+var path = require("path");
+var cookieParser = require("cookie-parser");
+var logger = require("morgan");
 
-const userRouter = require("./routes/user");
+var userRouter = require("./routes/user");
 const { connectDB } = require("./db");
 
 //Connect to db
 connectDB()
-  .then((r) => console.log("xd", r))
+  .then()
   .catch((e) => console.log(e));
 
 app.use(logger("dev"));
@@ -26,18 +26,6 @@ app.use("/users", userRouter);
 app.use(function (req, res, next) {
   next(createError(404));
 });
-
-// Socket code --> will be moved into seperate files
-/*const io = require("socket.io")(server, {
-  cors: { origin: ["http://localhost:8080"] },
-});
-const { sendMessage, joinRoom } = require("./socketHandler")(io);
-const onConnection = (socket) => {
-  socket.on("room:join", joinRoom);
-  socket.on("message:send", sendMessage);
-};
-
-io.on("connection", onConnection);*/
 
 // error handler
 app.use(function (err, req, res, next) {
