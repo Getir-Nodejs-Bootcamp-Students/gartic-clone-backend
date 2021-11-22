@@ -29,7 +29,6 @@ const joinRoom = async function (data) {
     socket.join(data.roomId);
     const roomExists = await getObject(data.roomId);
     if (roomExists) {
-        //connectedUsers[data.roomId] = [...connectedUsers[data.roomId], { userName: data.userName, socketId: socket.id, points: 0 }];
         roomExists.users.push({
             [socket.id]: {
                 isOwner: false,

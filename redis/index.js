@@ -8,7 +8,6 @@ client.on("error", function (error) {
 });
 
 const setObject = (key, object) => {
-    //console.log("redisObj", JSON.stringify(object));
     client.set(key, JSON.stringify(object));
 };
 const getObject = async (key) => {

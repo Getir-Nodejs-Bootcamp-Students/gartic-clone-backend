@@ -9,27 +9,8 @@ socketApi.io = io;
 
 io.on("connection", function (socket) {
     console.log("Socket connected");
-
-    // socket.on("room:join", (data) => {
-    //     socket.join(data.roomId);
-    //     const roomExists = connectedUsers[data.roomId];
-    //     if (roomExists) {
-    //         connectedUsers[data.roomId] = [...connectedUsers[data.roomId], { userName: data.userName, socketId: socket.id, points: 0 }];
-    //     }
-    //     //init room
-    //     else {
-    //         connectedUsers = {
-    //             ...connectedUsers,
-    //             [data.roomId]: [{ userName: data.userName, socketId: socket.id, points: 0 }],
-    //         };
-    //     }
-    //     socket.emit("postman:test", `${socket.id} odaya katıldı`);
-    //     console.log("connectedUsers", connectedUsers);
-    //     console.log("rooms", socket.rooms);
-    // });
     socket.on("room:join", joinRoom);
     socket.on("disconnecting", leaveRoom);
-    
     socket.on("disconnect", (data) => {
         console.log("Disconnected socket rooms ", socket.rooms);
     });
