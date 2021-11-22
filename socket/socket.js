@@ -2,24 +2,12 @@ const { joinRoom, sendMessage, drawCanvas } = require("./socketHandler");
 var socket_io = require("socket.io");
 var io = socket_io();
 var socketApi = {};
-var connectedUsers = {};
+var connectedUsers = {
+};
 socketApi.io = io;
 
 io.on("connection", function (socket) {
   console.log("Socket connected");
-  socket.on("disconnect", () => {
-    for (const room in connectedUsers) {
-      const index = connectedUsers[room].indexOf(socket.id);
-      if (index > -1) {
-        connectedUsers[room].splice(index, 1);
-        if (connectedUsers[room].length === 0) {
-          delete connectedUsers[room];
-        }
-      }
-    }
-
-    console.log("on disconnect", connectedUsers);
-  });
 
   socket.on("room:join", (data) => {
     socket.join(data.roomId);
@@ -34,20 +22,26 @@ io.on("connection", function (socket) {
         [data.roomId]: [{ userName: data.userName, socketId: socket.id,points : 0 }],
       };
     }
+    socket.emit("postman:test",`${socket.id} odaya katıldı`)
     console.log("connectedUsers", connectedUsers);
-    console.log("rooms", io.sockets.adapter.rooms);
+    console.log("rooms", socket.rooms);
   });
-
-  // socket.on("room:leave", (roomId) => {
-  //   const index = connectedUsers[roomId].indexOf(socket.id);
-  //   if (index > -1) {
-  //     connectedUsers[roomId].splice(index, 1);
-  //   }
-  //   socket.leave(socket.id);
-  //   console.log("Leave çalıştı -> ", connectedUsers);
-  // });
-  //socket.on("room:join", joinRoom);
-  //socket.on("message:send", sendMessage);
+  
+  socket.on("disconnecting", (data) => {
+    console.log("Disconnecting socket rooms ", socket.rooms);
+    console.log("Users during disconnection :",connectedUsers);
+    socket.rooms.forEach((value,key)=>{
+      if(Object.keys(connectedUsers).includes(key.toString())){
+        connectedUsers[key] = connectedUsers[key].filter(item => item.socketId != socket.id)
+        console.log("Deneme : ",connectedUsers[key]);
+      }
+    })
+    
+    
+  });
+  socket.on("disconnect", (data) => {
+    console.log("Disconnected socket rooms ", socket.rooms);
+  });
   socket.on("canvas:draw", (data) => {
     socket.broadcast.to(data.roomId).emit("canvas:drawing", data);
   });
