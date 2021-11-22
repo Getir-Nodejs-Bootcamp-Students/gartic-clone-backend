@@ -1,14 +1,12 @@
-var http = require("http");
-var createError = require("http-errors");
-var express = require("express");
-var app = express();
-var server = http.createServer(app);
-server.listen(5000);
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
+const http = require("http");
+const createError = require("http-errors");
+const express = require("express");
+const app = express();
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 
-var userRouter = require("./routes/user");
+const userRouter = require("./routes/user");
 const { connectDB } = require("./db");
 
 //Connect to db
