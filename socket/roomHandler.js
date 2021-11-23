@@ -52,27 +52,21 @@ const joinRoom = async function (data) {
                         points: 0,
                     },
                 },
+                
             ],
         });
     }
-    console.log("Redis check : ", await getObject(data.roomId));
-    console.log("rooms", socket.rooms);
 };
 
 const leaveRoom = async function () {
     const socket = this;
-    socket.rooms.forEach(async (value, key) => {
+    socket.rooms.forEach(async (value) => {
+        if(value == socket.id) return;
         const roomObj = await getObject(value);
-        if (roomObj) {
-            roomObj.users.forEach((value, index) => {
-                if (Object.keys(value)[0] === socket.id) {
-                    roomObj.users.splice(index, 1);
-                    console.log("roomObj", roomObj);
-                    setObject(value, roomObj);
-                }
-            });
-        }
-        console.log(await getObject(value));
+        roomObj.users = roomObj.users.filter(item => {
+            if(!Object.keys(item).includes(socket.id.toString())) return item;
+        })
+        await setObject(value,roomObj);
     });
 };
 
