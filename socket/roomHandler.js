@@ -26,9 +26,9 @@ const { generateRandomRoomId } = require("../helpers/helpers");
 
 const joinRoom = async function (data) {
   const socket = this;
-  socket.join(data.roomId);
-  socket.emit("room:get", await getObject(data.roomId));
   const roomExists = await getObject(data.roomId);
+
+  
   if (roomExists) {
     roomExists.users.push({
       [socket.id]: {
@@ -44,6 +44,7 @@ const joinRoom = async function (data) {
       gameState: false,
       timeStarted: false,
       wordPicked: null,
+      currentTurn : socket.id,
       owner : socket.id,
       users: [
         {
@@ -55,6 +56,8 @@ const joinRoom = async function (data) {
       ],
     });
   }
+  socket.join(data.roomId.toString());
+  socket.to(data.roomId).emit("room:get", await getObject(data.roomId));
 };
 
 const leaveRoom = async function () {
