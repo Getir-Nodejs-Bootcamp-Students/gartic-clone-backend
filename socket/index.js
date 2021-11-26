@@ -1,4 +1,5 @@
 const { joinRoom, leaveRoom } = require("./roomHandler");
+const { startGame, startTurn } = require("./gameHandler");
 var events = require("events");
 var socket_io = require("socket.io");
 const { EventEmitter } = require("stream");
@@ -8,14 +9,17 @@ var socketApi = {};
 socketApi.io = io;
 
 io.on("connection", function (socket) {
-    console.log("Socket connected");
-    socket.on("room:join", joinRoom);
+    socket.on("room:join", (data) => joinRoom(socket, io, data));
+    socket.on("game:start", (data) => startGame(socket, io, data));
+    
+    
+    // socket.on("game:startTurn", startTurn);
+    // socket.on("canvas:draw", (data) => {
+    //     socket.broadcast.to(data.roomId).emit("canvas:drawing", data);
+    // });
     socket.on("disconnecting", leaveRoom);
     socket.on("disconnect", (data) => {
         console.log("Disconnected socket rooms ", socket.rooms);
-    });
-    socket.on("canvas:draw", (data) => {
-        socket.broadcast.to(data.roomId).emit("canvas:drawing", data);
     });
 });
 

@@ -21,18 +21,16 @@ Example of a room object
   }
 */
 
-const { UnavailableForLegalReasons } = require("http-errors");
 const { setObject, getObject, deleteObject } = require("../redis/index");
+const { generateRandomRoomId } = require("../helpers/helpers");
 
-const joinRoom = async function (data) {
-    const socket = this;
-    socket.join(data.roomId);
+const joinRoom = async function (socket, io, data) {
     const roomExists = await getObject(data.roomId);
+
     if (roomExists) {
         roomExists.users.push({
             [socket.id]: {
-                isOwner: false,
-                userName: data.userName,
+                userName: data.userName || "guest-" + generateRandomRoomId(4),
                 points: 0,
             },
         });
@@ -44,10 +42,11 @@ const joinRoom = async function (data) {
             gameState: false,
             timeStarted: false,
             wordPicked: null,
+            currentTurn: socket.id,
+            owner: socket.id,
             users: [
                 {
                     [socket.id]: {
-                        isOwner: true,
                         userName: data.userName,
                         points: 0,
                     },
@@ -55,24 +54,23 @@ const joinRoom = async function (data) {
             ],
         });
     }
-    console.log("Redis check : ", await getObject(data.roomId));
-    console.log("rooms", socket.rooms);
+    socket.join(data.roomId.toString());
+    io.in(data.roomId).emit("room:get", await getObject(data.roomId));
 };
 
 const leaveRoom = async function () {
     const socket = this;
-    socket.rooms.forEach(async (value, key) => {
+    console.log("leave triggered")
+    socket.rooms.forEach(async (value) => {
+        if (value == socket.id) return;
         const roomObj = await getObject(value);
-        if (roomObj) {
-            roomObj.users.forEach((value, index) => {
-                if (Object.keys(value)[0] === socket.id) {
-                    roomObj.users.splice(index, 1);
-                    console.log("roomObj", roomObj);
-                    setObject(value, roomObj);
-                }
-            });
-        }
-        console.log(await getObject(value));
+        roomObj.users = roomObj.users.filter((item) => {
+            if (!Object.keys(item).includes(socket.id.toString())) return item;
+        });
+        console.log("roomobj", roomObj);
+        setObject(value, roomObj);
+        const users = await getObject(value);
+        console.log("Leave room ,", users);
     });
 };
 
