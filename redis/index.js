@@ -21,7 +21,6 @@ const deleteObject = (key) => {
 const flushRedis = () => {
     client.flushall();
 };
-
 module.exports = {
     setObject,
     getObject,
