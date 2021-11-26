@@ -12,7 +12,7 @@ io.on("connection", function (socket) {
 
     socket.on("room:join", joinRoom);
     socket.on("game:start",(data)=>startGame(socket,io,data));
-    socket.on("game:startTurn",startTurn);
+    socket.on("game:startTurn",(data) =>startTurn(io,socket,data));
     
     // socket.on("canvas:draw", (data) => {
     //     socket.broadcast.to(data.roomId).emit("canvas:drawing", data);
