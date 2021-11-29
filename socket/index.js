@@ -9,10 +9,10 @@ var socketApi = {};
 socketApi.io = io;
 
 io.on("connection", function (socket) {
+    //console.log("io.sockets", io.sockets.sockets.get);
     socket.on("room:join", (data) => joinRoom(socket, io, data));
     socket.on("game:start", (data) => startGame(socket, io, data));
-    
-    
+
     // socket.on("game:startTurn", startTurn);
     // socket.on("canvas:draw", (data) => {
     //     socket.broadcast.to(data.roomId).emit("canvas:drawing", data);
