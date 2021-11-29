@@ -42,6 +42,7 @@ const joinRoom = async function (socket, io, data) {
             gameState: false,
             timeStarted: false,
             wordPicked: null,
+            whoGuessed : 0,
             currentTurn: socket.id,
             owner: socket.id,
             users: [
@@ -54,6 +55,7 @@ const joinRoom = async function (socket, io, data) {
             ],
         });
     }
+    console.log("Redise yazıldı");
     socket.join(data.roomId.toString());
     io.in(data.roomId).emit("room:get", await getObject(data.roomId));
 };

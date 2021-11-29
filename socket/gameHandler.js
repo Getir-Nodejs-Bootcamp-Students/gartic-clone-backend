@@ -22,6 +22,7 @@ const startTurn = async function (socket, io, roomId, currentTurn) {
   setObject(roomId, room);
   io.to(room.currentTurn).emit("game:wordPick", ["Agac", "At", "Dana"]);
   io.in(roomId).emit("room:get", await getObject(roomId));
+  socket.removeAllListeners("game:wordPicked");
   timeTicker(socket, io, roomId);
 };
 
@@ -35,11 +36,12 @@ const timeTicker = async (socket, io, roomId) => {
       clearInterval(wordTimerInterval);
     }
   }, 1000);
-  console.log("ben burdaayım")
+  console.log("ben burdaayım");
   socket.on("game:wordPicked", async (word) => {
     console.log("word", word);
     const room = await getObject(roomId);
     room.wordPicked = word;
+    setObject(roomId,room);
     let drawTime = 5;
     clearInterval(wordTimerInterval);
     let drawTimerInterval = setInterval(async () => {
@@ -59,6 +61,7 @@ const timeTicker = async (socket, io, roomId) => {
       }
     }, 1000);
   });
+  console.log(socket.listeners("game:wordPicked"));
 };
 
 module.exports = {
