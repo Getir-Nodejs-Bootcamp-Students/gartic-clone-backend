@@ -5,14 +5,14 @@ const { get } = require("http");
 const time = new EventEmitter();
 
 const startGame = async function (socket, io, data) {
-  const room = await getObject(data.roomId);
-  room.gameState = true;
-  setObject(data.roomId, room);
-  io.in(data.roomId.toString()).emit("game:started", {
-    currentTurn: socket.id,
-    gameState: true,
-  });
-  startTurn(socket, io, data.roomId, socket.id);
+    const room = await getObject(data.roomId);
+    room.gameState = true;
+    setObject(data.roomId, room);
+    io.in(data.roomId.toString()).emit("game:started", {
+        currentTurn: socket.id,
+        gameState: true,
+    });
+    startTurn(socket, io, data.roomId, socket.id);
 };
 
 const startTurn = async function (socket, io, roomId, currentTurn) {
@@ -73,7 +73,7 @@ const timeTicker = async (socket, io, roomId) => {
 };
 
 module.exports = {
-  startGame,
-  startTurn,
-  timeTicker,
+    startGame,
+    startTurn,
+    timeTicker,
 };
