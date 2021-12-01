@@ -1,6 +1,10 @@
 const { joinRoom, leaveRoom } = require("./roomHandler");
 const { startGame, startTurn } = require("./gameHandler");
-const {guessMessageListener, chatMessageListener} = require('./messageHandler')
+const {
+  guessMessageListener,
+  chatMessageListener,
+} = require("./messageHandler");
+const { canvasDraw } = require("./canvasHandler");
 var events = require("events");
 var socket_io = require("socket.io");
 const { EventEmitter } = require("stream");
@@ -14,7 +18,7 @@ io.on("connection", function (socket) {
   socket.on("game:start", (data) => startGame(socket, io, data));
   socket.on("message:guess", (data) => guessMessageListener(socket, io, data));
   socket.on("message:chat", (data) => chatMessageListener(socket, io, data));
-
+  socket.on("canvas:draw", canvasDraw);
   // socket.on("game:startTurn", startTurn);
   // socket.on("canvas:draw", (data) => {
   //     socket.broadcast.to(data.roomId).emit("canvas:drawing", data);

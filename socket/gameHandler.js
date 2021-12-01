@@ -17,6 +17,7 @@ const startGame = async function (socket, io, data) {
 
 const startTurn = async function (socket, io, roomId, currentTurn) {
   let room = await getObject(roomId.toString());
+  room.guessCnt = 0;
   console.log(currentTurn);
   room = { ...room, currentTurn: currentTurn };
   setObject(roomId, room);
@@ -41,8 +42,10 @@ const timeTicker = async (socket, io, roomId) => {
     console.log("word", word);
     const room = await getObject(roomId);
     room.wordPicked = word;
-    setObject(roomId,room);
-    let drawTime = 5;
+    console.log("data when word picked: ",room.wordPicked);
+  
+    setObject(roomId, room);
+    let drawTime = 10;
     clearInterval(wordTimerInterval);
     let drawTimerInterval = setInterval(async () => {
       io.in(roomId).emit("time:remaining", drawTime);
@@ -56,7 +59,12 @@ const timeTicker = async (socket, io, roomId) => {
         const nextPlayerIndex =
           (room.users.findIndex(currentTurnIndex) + 1) % room.users.length;
         const currentTurnId = Object.keys(room.users[nextPlayerIndex])[0];
-        startTurn(socket, io, roomId, currentTurnId);
+        startTurn(
+          io.sockets.sockets.get(currentTurnId),
+          io,
+          roomId,
+          currentTurnId
+        );
         clearInterval(drawTimerInterval);
       }
     }, 1000);
