@@ -1,4 +1,5 @@
 const { setObject, getObject, deleteObject } = require("../redis/index");
+const Word = require('../model/Word');
 const EventEmitter = require("events");
 const { wordPickTime } = require("../config/index");
 const { get } = require("http");
@@ -21,7 +22,7 @@ const startTurn = async function (socket, io, roomId, currentTurn) {
   console.log(currentTurn);
   room = { ...room, currentTurn: currentTurn };
   setObject(roomId, room);
-  io.to(room.currentTurn).emit("game:wordPick", ["Agac", "At", "Dana"]);
+  io.to(room.currentTurn).emit("game:wordPick", await getRandomWordsFromDB());
   io.in(roomId).emit("room:get", await getObject(roomId));
   socket.removeAllListeners("game:wordPicked");
   timeTicker(socket, io, roomId);
@@ -72,6 +73,29 @@ const timeTicker = async (socket, io, roomId) => {
   console.log(socket.listeners("game:wordPicked"));
 };
 
+const getRandomWordsFromDB = async (req, res) => {
+  let wordsArr = [];
+  let words = await Word.aggregate([
+    {
+      $sample: {
+        size: 3,
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        createdAt: 0,
+        updatedAt: 0,
+        __v: 0,
+      },
+    },
+  ]);
+  words.forEach(word => {
+      wordsArr.push(word.text);
+  })
+  return wordsArr
+};
+ 
 module.exports = {
   startGame,
   startTurn,

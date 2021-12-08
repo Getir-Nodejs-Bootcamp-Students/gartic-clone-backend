@@ -1,28 +1,9 @@
-/*
-Example of a room object
-  {
-    [
-      "roomId" : {
-        gameState: false,
-        timeStarted: false,
-        wordPicked: "salam",
-        turnId : socket.id
-        users: [
-           {
-             "socketId" : {
-                isOwner : true,
-                userName: "Emree",
-                points: 0,
-            }
-          },
-        ]
-      }
-    ]
-  }
-*/
-
 const { setObject, getObject, deleteObject } = require("../redis/index");
 const { generateRandomRoomId } = require("../helpers/helpers");
+const redis = require("redis");
+const util = require("util");
+const client = redis.createClient();
+client.get = util.promisify(client.get);
 
 const joinRoom = async function (socket, io, data) {
   const roomExists = await getObject(data.roomId);
@@ -60,18 +41,25 @@ const joinRoom = async function (socket, io, data) {
 };
 
 const leaveRoom = async function () {
+  console.log("çalıştı")
   const socket = this;
-  console.log("leave triggered");
-  socket.rooms.forEach(async (value) => {
-    if (value == socket.id) return;
-    const roomObj = await getObject(value);
-    roomObj.users = roomObj.users.filter((item) => {
-      if (!Object.keys(item).includes(socket.id.toString())) return item;
-    });
-    console.log("roomobj", roomObj);
-    setObject(value, roomObj);
-    const users = await getObject(value);
-    console.log("Leave room ,", users);
+  client.keys("*", async (err, keys) => {
+    for (const key of keys) {
+      const object = await getObject(key);
+      object.users.forEach((e, i) => {
+        if (Object.keys(e)[0] === socket.id) {
+          object.users.splice(i, 1);
+          setObject(key, object);
+        }
+      });
+      // for (const user of users) {
+      //   if (Object.keys(user)[0] === socket.id) {
+      //     //delete object[Object.keys(user)[0]];
+      //     setObject(key, object);
+      //     console.log(object)
+      //   }
+      // }
+    }
   });
 };
 
