@@ -1,12 +1,12 @@
-var http = require("http");
-var createError = require("http-errors");
-var express = require("express");
-var app = express();
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
-
-var userRouter = require("./routes/user");
+const http = require("http");
+const createError = require("http-errors");
+const express = require("express");
+const app = express();
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const cors = require('cors')
+const { userRouter, wordRouter } = require("./routes/index");
 const { connectDB } = require("./db");
 
 //Connect to db
@@ -16,11 +16,13 @@ connectDB()
 
 app.use(logger("dev"));
 app.use(express.json());
+app.use(cors({credentials: true, origin: true}))
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/users", userRouter);
+app.use("/words", wordRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
