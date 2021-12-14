@@ -19,10 +19,10 @@ io.on("connection", function (socket) {
     socket.on("message:guess", (data) => guessMessageListener(socket, io, data));
     socket.on("message:chat", (data) => chatMessageListener(socket, io, data));
     socket.on("canvas:draw", canvasDraw);
-    // socket.on("canvas:draw", (data) => {
-    //     socket.broadcast.to(data.roomId).emit("canvas:drawing", data);
-    // });
-    socket.on("disconnecting", leaveRoom);
+    socket.on("canvas:draw", (data) => {
+        socket.broadcast.to(data.roomId).emit("canvas:drawing", data);
+    });
+    socket.on("disconnecting", () => leaveRoom(socket, io));
     socket.on("disconnect", (data) => {
         console.log("Disconnected socket rooms ", socket.rooms);
     });

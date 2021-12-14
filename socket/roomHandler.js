@@ -40,8 +40,7 @@ const joinRoom = async function (socket, io, data) {
     io.in(data.roomId).emit("room:get", await getObject(data.roomId));
 };
 
-const leaveRoom = async function () {
-    const socket = this;
+const leaveRoom = async function (socket, io) {
     client.keys("*", async (err, keys) => {
         for (const key of keys) {
             const room = await getObject(key);
@@ -49,6 +48,7 @@ const leaveRoom = async function () {
                 if (Object.keys(e)[0] === socket.id) {
                     room.users.splice(i, 1);
                     setObject(key, room);
+                    io.in(key).emit("room:get", room);
                 }
             });
         }

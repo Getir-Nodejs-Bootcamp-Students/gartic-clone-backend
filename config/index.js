@@ -8,5 +8,5 @@ const { DB_URI, PORT, SECRET_KEY } = process.env;
 exports.port = PORT || 3000;
 exports.dbUri = DB_URI;
 exports.SECRET_KEY = SECRET_KEY;
-exports.wordPickTime = 10;
-exports.drawTime = 30;
+exports.wordPickTime = 15;
+exports.drawTime = 60;
